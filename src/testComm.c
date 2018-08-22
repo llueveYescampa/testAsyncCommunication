@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
     //const int mcount=386000000; // this take ~ 1.0 seconds in blackPanther GNU
     //const int mcount=415500000; // this take ~ 1.0 seconds in blackPanther Intel
     const int mcount=387000000; // this take ~ 1.0 seconds in blackPanther Pgi
-    MPI_Request req;
+    MPI_Request reqR;
     real *rbuf, *sbuf;
     rbuf     = (real *) malloc((mcount)*sizeof(real)); 
     sbuf     = (real *) malloc((mcount)*sizeof(real)); 
@@ -32,17 +32,18 @@ int main(int argc, char *argv[])
     if (worldRank == 0) {
         real calcTime=0.0;
         real etime = -MPI_Wtime();
-        MPI_Irecv(rbuf,mcount,MPI_MY_REAL,1, 231,MPI_COMM_WORLD,&req);
+        MPI_Irecv(rbuf,mcount,MPI_MY_REAL,1, 231,MPI_COMM_WORLD,&reqR);
         //MPI_Recv(rbuf,mcount,MPI_MY_REAL,1, 231,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
         
         calcTime = do_work( (unsigned int)  250000); // 0.25 seconds
         
-        MPI_Wait(&req,MPI_STATUS_IGNORE);
+        MPI_Wait(&reqR,MPI_STATUS_IGNORE);
         etime += MPI_Wtime();
         printf("%g %g\n",calcTime,etime );
     } else {
         MPI_Send(sbuf,mcount,MPI_MY_REAL,0, 231,MPI_COMM_WORLD);
     }  // end if //
+
     
     free(sbuf);
     free(rbuf);
