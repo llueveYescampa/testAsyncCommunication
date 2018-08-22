@@ -21,9 +21,10 @@ int main(int argc, char *argv[])
         exit(-1);
     } // end if // 
     
+    const int mcount=124000; // this take ~ 1.0 seconds in blackPanther+blackEngineering GNU
     //const int mcount=386000000; // this take ~ 1.0 seconds in blackPanther GNU
     //const int mcount=415500000; // this take ~ 1.0 seconds in blackPanther Intel
-    const int mcount=387000000; // this take ~ 1.0 seconds in blackPanther Pgi
+    //const int mcount=387000000; // this take ~ 1.0 seconds in blackPanther Pgi
     MPI_Request reqR;
     real *rbuf, *sbuf;
     rbuf     = (real *) malloc((mcount)*sizeof(real)); 
