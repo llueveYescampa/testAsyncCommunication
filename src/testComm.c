@@ -11,18 +11,39 @@ int main(int argc, char *argv[])
     int provided;
     MPI_Init_thread(&argc, &argv, MPI_THREAD_SINGLE, &provided);
 
+
     int worldRank, worldSize;
     MPI_Comm_rank(MPI_COMM_WORLD,&worldRank);
     MPI_Comm_size(MPI_COMM_WORLD,&worldSize);
+
+    // creating an intranode communicator 
+    MPI_Comm sm_comm;
+    MPI_Comm_split_type(MPI_COMM_WORLD,MPI_COMM_TYPE_SHARED, 0,MPI_INFO_NULL, &sm_comm);
+    int sharedRank,sharedSize;
+    MPI_Comm_rank(sm_comm,&sharedRank);
+    MPI_Comm_size(sm_comm,&sharedSize);
+    // creating an intranode communicator 
+
+    // creating a communicator for the lead processes in each node
+    MPI_Comm nodeComm;
+    MPI_Comm_split(MPI_COMM_WORLD, sharedRank, (worldRank/sharedSize), &nodeComm );
+    int nodeNumber,numberOfNodes;
+    MPI_Comm_rank(nodeComm,&nodeNumber);
+    MPI_Comm_size(nodeComm,&numberOfNodes);
+    // creating a communicator for the lead processes in each node
     
     if (worldSize != 2) {
         if (worldRank == 0) printf("Please, run using two processes. Quiting ...\n");
         MPI_Finalize();
         exit(-1);
     } // end if // 
+
+    if (worldRank == 0) {
+        printf("num of nodes used: %d, worldSize: %d, sharedSize: %d\n", numberOfNodes,worldSize,sharedSize);
+    } // end if //
     
-    const int mcount=124000; // this take ~ 1.0 seconds in blackPanther+blackEngineering GNU
-    //const int mcount=386000000; // this take ~ 1.0 seconds in blackPanther GNU
+    //const int mcount=124000; // this take ~ 1.0 seconds in blackPanther+blackEngineering GNU
+    const int mcount=386000000; // this take ~ 1.0 seconds in blackPanther GNU
     //const int mcount=415500000; // this take ~ 1.0 seconds in blackPanther Intel
     //const int mcount=387000000; // this take ~ 1.0 seconds in blackPanther Pgi
     MPI_Request reqR;
