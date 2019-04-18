@@ -42,10 +42,15 @@ int main(int argc, char *argv[])
         printf("num of nodes used: %d, worldSize: %d, sharedSize: %d\n", numberOfNodes,worldSize,sharedSize);
     } // end if //
     
-    //const int mcount=124000; // this take ~ 1.0 seconds in blackPanther+blackEngineering GNU
-    const int mcount=386000000; // this take ~ 1.0 seconds in blackPanther GNU
+    //const int mcount=386000000; // this take ~ 1.0 seconds in blackPanther GNU
     //const int mcount=415500000; // this take ~ 1.0 seconds in blackPanther Intel
     //const int mcount=387000000; // this take ~ 1.0 seconds in blackPanther Pgi
+    
+    const int mcount=8870000; // this take ~ 10.0 seconds in blackPanther+blackEngineering Gnu
+    //const int mcount=8800000; // this take ~ 10.0 seconds in blackPanther+blackEngineering Intel
+    //const int mcount=8650000; // this take ~ 10.0 seconds in blackPanther+blackEngineering Pgi
+    
+    
     MPI_Request reqR;
     real *rbuf, *sbuf;
     rbuf     = (real *) malloc((mcount)*sizeof(real)); 
@@ -57,7 +62,8 @@ int main(int argc, char *argv[])
         MPI_Irecv(rbuf,mcount,MPI_MY_REAL,1, 231,MPI_COMM_WORLD,&reqR);
         //MPI_Recv(rbuf,mcount,MPI_MY_REAL,1, 231,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
         
-        calcTime = do_work( (unsigned int)  250000); // 0.25 seconds
+        //calcTime = do_work( (unsigned int)  250000); // 0.25 seconds
+        calcTime = do_work( (unsigned int)  2500000); // 2.5 seconds
         
         MPI_Wait(&reqR,MPI_STATUS_IGNORE);
         etime += MPI_Wtime();
