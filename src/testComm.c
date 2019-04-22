@@ -46,12 +46,12 @@ int main(int argc, char *argv[])
     //const int mcount=415500000; // this take ~ 1.0 seconds in blackPanther Intel
     //const int mcount=387000000; // this take ~ 1.0 seconds in blackPanther Pgi
     
-    const int mcount=8870000; // this take ~ 10.0 seconds in blackPanther+blackEngineering Gnu
-    //const int mcount=8800000; // this take ~ 10.0 seconds in blackPanther+blackEngineering Intel
+    //const int mcount=8870000; // this take ~ 10.0 seconds in blackPanther+blackEngineering Gnu
+    const int mcount=8800000; // this take ~ 10.0 seconds in blackPanther+blackEngineering Intel
     //const int mcount=8650000; // this take ~ 10.0 seconds in blackPanther+blackEngineering Pgi
     
     
-    MPI_Request reqR;
+    MPI_Request req;
     real *rbuf, *sbuf;
     rbuf     = (real *) malloc((mcount)*sizeof(real)); 
     sbuf     = (real *) malloc((mcount)*sizeof(real)); 
@@ -59,17 +59,18 @@ int main(int argc, char *argv[])
     if (worldRank == 0) {
         real calcTime=0.0;
         real etime = -MPI_Wtime();
-        MPI_Irecv(rbuf,mcount,MPI_MY_REAL,1, 231,MPI_COMM_WORLD,&reqR);
-        //MPI_Recv(rbuf,mcount,MPI_MY_REAL,1, 231,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+        //MPI_Irecv(rbuf,mcount,MPI_MY_REAL,1, 231,MPI_COMM_WORLD,&req);
+        MPI_Isend(sbuf,mcount,MPI_MY_REAL,1, 231,MPI_COMM_WORLD,&req);
         
         //calcTime = do_work( (unsigned int)  250000); // 0.25 seconds
         calcTime = do_work( (unsigned int)  2500000); // 2.5 seconds
         
-        MPI_Wait(&reqR,MPI_STATUS_IGNORE);
+        MPI_Wait(&req,MPI_STATUS_IGNORE);
         etime += MPI_Wtime();
         printf("%g %g\n",calcTime,etime );
     } else {
-        MPI_Send(sbuf,mcount,MPI_MY_REAL,0, 231,MPI_COMM_WORLD);
+        //MPI_Send(sbuf,mcount,MPI_MY_REAL,0, 231,MPI_COMM_WORLD);
+        MPI_Recv(rbuf,mcount,MPI_MY_REAL,0, 231,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
     }  // end if //
 
     
