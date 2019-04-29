@@ -6,7 +6,7 @@
 #include "real.h"
 
 
-real do_work(clock_t mseconds);
+double do_work(double mseconds);
 
 int main(int argc, char *argv[]) 
 {
@@ -59,13 +59,13 @@ int main(int argc, char *argv[])
     sbuf     = (real *) malloc((mcount)*sizeof(real)); 
     
     if (worldRank == 0) {
-        real calcTime=0.0;
+        double calcTime=0.0;
         real etime = -MPI_Wtime();
         //MPI_Irecv(rbuf,mcount,MPI_MY_REAL,1, 231,MPI_COMM_WORLD,&req);
         MPI_Isend(sbuf,mcount,MPI_MY_REAL,1, 231,MPI_COMM_WORLD,&req);
         
         //calcTime = do_work( (unsigned int)  250000); // 0.25 seconds
-        calcTime = do_work( (clock_t)  2500000); // 2.5 seconds
+        calcTime = do_work( (double)  2500000); // 2.5 seconds
         
         MPI_Wait(&req,MPI_STATUS_IGNORE);
         etime += MPI_Wtime();

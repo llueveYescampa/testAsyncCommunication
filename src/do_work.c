@@ -1,18 +1,30 @@
 #include <math.h>
-#include <mpi.h>
-#include "real.h"
+#include <sys/time.h>
 
 #include<time.h>
 
-real do_work(clock_t mseconds) {
-    
-    clock_t goal = mseconds + clock();
-    
-    real etime = -MPI_Wtime();
-    while (goal > clock());
-    etime += MPI_Wtime();
+double do_work(double mseconds) 
+{
+    struct timeval tp;
 
-    return etime;
+    double etimeS, etimeE;
+    
+    gettimeofday(&tp,NULL);
+    etimeS = (tp.tv_sec*1.0e6 + tp.tv_usec); 
+    
+    
+    const double goal = etimeS + mseconds;
+    double partial;
+    
+    do {
+        gettimeofday(&tp,NULL);
+        partial = (tp.tv_sec*1.0e6 + tp.tv_usec) ;
+    } while (goal > partial );
+
+    etimeE = (partial-etimeS)*1.0e-6;
+
+
+    return etimeE;
 } // end of do_work() //
 
 
