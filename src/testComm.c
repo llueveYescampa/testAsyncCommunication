@@ -1,10 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <mpi.h>
+#include<time.h>
+
 #include "real.h"
 
 
-real do_work(unsigned int mseconds);
+real do_work(clock_t mseconds);
 
 int main(int argc, char *argv[]) 
 {
@@ -47,7 +49,7 @@ int main(int argc, char *argv[])
     //const int mcount=387000000; // this take ~ 1.0 seconds in blackPanther Pgi
     
     //const int mcount=8870000; // this take ~ 10.0 seconds in blackPanther+blackEngineering Gnu
-    const int mcount=8800000; // this take ~ 10.0 seconds in blackPanther+blackEngineering Intel
+    const int mcount=8650000; // this take ~ 10.0 seconds in blackPanther+blackEngineering Intel
     //const int mcount=8650000; // this take ~ 10.0 seconds in blackPanther+blackEngineering Pgi
     
     
@@ -63,7 +65,7 @@ int main(int argc, char *argv[])
         MPI_Isend(sbuf,mcount,MPI_MY_REAL,1, 231,MPI_COMM_WORLD,&req);
         
         //calcTime = do_work( (unsigned int)  250000); // 0.25 seconds
-        calcTime = do_work( (unsigned int)  2500000); // 2.5 seconds
+        calcTime = do_work( (clock_t)  2500000); // 2.5 seconds
         
         MPI_Wait(&req,MPI_STATUS_IGNORE);
         etime += MPI_Wtime();

@@ -4,7 +4,7 @@
 
 #include<time.h>
 
-real do_work(unsigned int mseconds) {
+real do_work(clock_t mseconds) {
     
     clock_t goal = mseconds + clock();
     
