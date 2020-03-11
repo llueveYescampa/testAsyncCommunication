@@ -43,13 +43,17 @@ int main(int argc, char *argv[])
     if (worldRank == 0) {
         printf("num of nodes used: %d, worldSize: %d, sharedSize: %d\n", numberOfNodes,worldSize,sharedSize);
     } // end if //
-    
-    //const int mcount=386000000; // this take ~ 1.0 seconds in blackPanther GNU
-    //const int mcount=415500000; // this take ~ 1.0 seconds in blackPanther Intel
-    //const int mcount=387000000; // this take ~ 1.0 seconds in blackPanther Pgi
-    
+
+
+#if (__PGI)    
+    const int mcount=337500000; // this take ~ 1.0 seconds in blackPanther Pgi
+#elif (__ICC)
+    const int mcount=341000000; // this take ~ 1.0 seconds in blackPanther Intel
+#else    
+    const int mcount=335500000; // this take ~ 1.0 seconds in blackPanther GNU
+#endif    
     //const int mcount=8870000; // this take ~ 10.0 seconds in blackPanther+blackEngineering Gnu
-    const int mcount=8650000; // this take ~ 10.0 seconds in blackPanther+blackEngineering Intel
+    //const int mcount=8650000; // this take ~ 10.0 seconds in blackPanther+blackEngineering Intel
     //const int mcount=8650000; // this take ~ 10.0 seconds in blackPanther+blackEngineering Pgi
     
     
