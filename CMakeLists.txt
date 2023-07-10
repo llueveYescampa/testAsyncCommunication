@@ -10,12 +10,14 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_BUILD_TYPE Release)
 
 ## adding the following lines while cleaning the code
+MESSAGE( STATUS "CMAKE_C_COMPILER_ID: "         ${CMAKE_C_COMPILER_ID} )
 if (CMAKE_C_COMPILER_ID STREQUAL "GNU" )
     set(CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} -Wall -Wextra -Wno-unused-result -Wno-unused-parameter -ftree-vectorize -fopt-info-vec-optimized -ffast-math ")
     set(CMAKE_EXE_LINKER_FLAGS "-lm" )
-elseif ( CMAKE_C_COMPILER_ID STREQUAL "Intel" )
-    set(CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} -Wall -qopt-report=3 -qopt-report-phase=vec")
-elseif ( CMAKE_C_COMPILER_ID STREQUAL "PGI" )
+elseif ( CMAKE_C_COMPILER_ID STREQUAL "IntelLLVM" )
+    set(CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} -Wall -fvectorize  -qopt-report-file=stderr -qopt-report=max  -xCORE-AVX2")
+    #set(CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} -Wall -qopt-report=5 -qopt-report-phase=vec")
+elseif ( CMAKE_C_COMPILER_ID STREQUAL "NVHPC" )
     set(CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} -Minform=inform -Mnodepchk -Minfo=all -Mvect=simd ")
     #set(CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} -Minform=inform -Mnodepchk -Minfo=all -Mvect=simd -tp=px ")
 endif ( )
@@ -42,5 +44,3 @@ target_link_libraries(testComm ${MPI_LIBRARIES} ${CMAKE_EXE_LINKER_FLAGS})
 #MESSAGE( STATUS "CMAKE_C_FLAGS: "               ${CMAKE_C_FLAGS} )
 #MESSAGE( STATUS "CMAKE_CURRENT_SOURCE_DIR: "    ${CMAKE_CURRENT_SOURCE_DIR} )
 ########### end of Debug messages #################
-
-
