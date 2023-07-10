@@ -46,39 +46,47 @@ int main(int argc, char *argv[])
 
 
 #if (__PGI)    
-    const int mcount=337500000; // this take ~ 1.0 seconds in blackPanther Pgi
+    const int mcount=356200000; // this take ~ 1.3 seconds in blackPanther 
+                                // Nvidia nvc + Open MPI 4.05. if this number 
+                                // is a little bigger, the program fails
 #elif (__ICC)
-    const int mcount=341000000; // this take ~ 1.0 seconds in blackPanther Intel
+    const int mcount=307000000; // this take ~ 2.0 seconds in blackPanther Intel
 #else    
-    const int mcount=335500000; // this take ~ 1.0 seconds in blackPanther GNU
+    const int mcount=330200000; // this take ~ 2.0 seconds in blackPanther GNU
 #endif    
     //const int mcount=8870000; // this take ~ 10.0 seconds in blackPanther+blackEngineering Gnu
     //const int mcount=8650000; // this take ~ 10.0 seconds in blackPanther+blackEngineering Intel
     //const int mcount=8650000; // this take ~ 10.0 seconds in blackPanther+blackEngineering Pgi
     
     
-    MPI_Request req;
+    MPI_Request reqS, reqR;
     real *rbuf, *sbuf;
     rbuf     = (real *) malloc((mcount)*sizeof(real)); 
     sbuf     = (real *) malloc((mcount)*sizeof(real)); 
     
+    
+    double calcTime=0.0;
+    real etime = -MPI_Wtime();
+    
     if (worldRank == 0) {
-        double calcTime=0.0;
-        real etime = -MPI_Wtime();
-        //MPI_Irecv(rbuf,mcount,MPI_MY_REAL,1, 231,MPI_COMM_WORLD,&req);
-        MPI_Isend(sbuf,mcount,MPI_MY_REAL,1, 231,MPI_COMM_WORLD,&req);
-        
-        //calcTime = do_work( (unsigned int)  250000); // 0.25 seconds
-        calcTime = do_work( (double)  2500000); // 2.5 seconds
-        
-        MPI_Wait(&req,MPI_STATUS_IGNORE);
-        etime += MPI_Wtime();
-        printf("%g %g\n",calcTime,etime );
+        MPI_Irecv(rbuf,mcount,MPI_MY_REAL,1, 131,MPI_COMM_WORLD,&reqR);
+        MPI_Isend(sbuf,mcount,MPI_MY_REAL,1, 231,MPI_COMM_WORLD,&reqS);
     } else {
-        //MPI_Send(sbuf,mcount,MPI_MY_REAL,0, 231,MPI_COMM_WORLD);
-        MPI_Recv(rbuf,mcount,MPI_MY_REAL,0, 231,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+        MPI_Isend(sbuf,mcount,MPI_MY_REAL,0, 131,MPI_COMM_WORLD,&reqS);
+        MPI_Irecv(rbuf,mcount,MPI_MY_REAL,0, 231,MPI_COMM_WORLD,&reqR);
     }  // end if //
 
+
+    //calcTime = do_work( (unsigned int)  250000); // 0.25 seconds
+    calcTime = do_work( (double)  2500000); // 2.5 seconds
+    // waitting for the comunication to finish
+
+    MPI_Waitall(1, &reqR,MPI_STATUS_IGNORE);
+    MPI_Waitall(1, &reqS,MPI_STATUS_IGNORE);
+    
+    
+    etime += MPI_Wtime();
+    if (worldRank == 0) printf("%g %g\n",calcTime,etime );
     
     free(sbuf);
     free(rbuf);
